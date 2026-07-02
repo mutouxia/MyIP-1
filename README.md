@@ -2,10 +2,31 @@
 
 An alternative ip111 service
 
+MyIP is a static network egress diagnostic page. It aggregates public IP probe
+endpoints and geo databases so users can compare which exit IP is exposed when
+their browser reaches different services.
+
+## Development
+
+```bash
+npm install
+npm run dev
+```
+
+## Build
+
+```bash
+npm run test
+npm run build
+```
+
+The site is built into `dist` and can be deployed directly to GitHub Pages.
+
 ## Info
 
 - IPIP.net API: `https://myip.ipip.net`
-- Sohu JSONP IP API: `https://pv.sohu.com/cityjson?ie=utf-8`
+- PChome JSONP IP API: `https://whois.pconline.com.cn/ipJson.jsp`
+- ~~Sohu JSONP IP API: `https://pv.sohu.com/cityjson?ie=utf-8`~~
 - IP.SB API: `https://ip.sb/api/`
 - IPAPI: `https://ipapi.co/json`
 - Meo IP API: `https://ip.mcr.moe/`
@@ -13,7 +34,6 @@ An alternative ip111 service
 - ~~IP-API: `https://ip-api.com/json`~~
 - ~~Taobao JSONP IP API: `https://www.taobao.com/help/getip.php`~~
 - ~~Taobao JSONP GEO API: `http://ip.taobao.com/service/getIpInfo.php`~~
-- ~~PCHome JSONP IP API: `http://whois.pconline.com.cn/ipJson.jsp`~~
 
 ## Contributing
 

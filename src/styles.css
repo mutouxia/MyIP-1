@@ -1,0 +1,179 @@
+.box {
+  padding: 0.75rem 1.25rem !important;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.container {
+  flex: 1;
+}
+
+@media (max-width: 1087px) {
+  .container {
+    padding-left: 3rem;
+    padding-right: 3rem;
+  }
+}
+
+.ip-body {
+  min-height: 48px;
+}
+
+.ip-card-row {
+  align-items: stretch;
+}
+
+.ip-card-row > .column {
+  display: flex;
+}
+
+.ip-card-row .box {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.ip-card-row .ip-body {
+  flex: 1;
+}
+
+.http-body {
+  min-height: 24px;
+}
+
+.main-section {
+  padding: 0;
+}
+
+.page-title {
+  margin-top: 3rem;
+}
+
+.section-title {
+  margin-top: 3rem;
+}
+
+.page-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: auto;
+  padding: 3rem 0 0.5rem;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.page-footer a {
+  color: #666;
+  text-decoration: none;
+}
+
+.page-footer a:hover {
+  color: #333;
+  text-decoration: underline;
+}
+
+.geo-settings {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #666;
+}
+
+.geo-settings select {
+  min-width: 7.5rem;
+  height: 2rem;
+  padding: 0 0.5rem;
+  border: 1px solid #dbdbdb;
+  border-radius: 4px;
+  background: #fff;
+  color: #444;
+  font-size: 0.875rem;
+}
+
+.github-corner-svg {
+  fill: #151513;
+  color: #fff;
+  position: absolute;
+  top: 0;
+  border: 0;
+  right: 0;
+}
+
+.github-corner .octo-arm {
+  transform-origin: 130px 106px;
+}
+
+.github-corner:hover .octo-arm {
+  animation: octocat-wave 560ms ease-in-out;
+}
+
+@keyframes octocat-wave {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+
+  20%,
+  60% {
+    transform: rotate(-25deg);
+  }
+
+  40%,
+  80% {
+    transform: rotate(10deg);
+  }
+}
+
+.simple-page {
+  display: flex;
+}
+
+.simple-column-main {
+  width: 75%;
+}
+
+.simple-column-side {
+  width: 25%;
+}
+
+.ip-title {
+  font-weight: bold;
+  color: #444;
+}
+
+.sk-text-success {
+  color: #32b643;
+}
+
+.sk-text-error {
+  color: #e85600;
+}
+
+.simple-page h3 {
+  margin: 0 0 6px;
+}
+
+.simple-page p {
+  margin: 2px 0;
+}
+
+.simple-page a {
+  text-decoration: none;
+  color: #666;
+}
+
+@media (max-width: 500px) {
+  .github-corner:hover .octo-arm {
+    animation: none;
+  }
+
+  .github-corner .octo-arm {
+    animation: octocat-wave 560ms ease-in-out;
+  }
+}
