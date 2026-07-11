@@ -1,4 +1,3 @@
-import { errorMessage } from "../lib/timing";
 import type { ConnectivityCheck, ConnectivityResult } from "../types";
 
 export const connectivityChecks: ConnectivityCheck[] = [
@@ -50,7 +49,7 @@ export function runConnectivityCheck(check: ConnectivityCheck, timeoutMs = 6000)
     }, timeoutMs);
 
     image.onload = () => finish({ status: "success" });
-    image.onerror = (event) => finish({ status: "error", error: errorMessage(event) || "无法访问" });
+    image.onerror = () => finish({ status: "error", error: "无法访问" });
     image.src = `${check.url}?z=${Date.now()}`;
   });
 }
