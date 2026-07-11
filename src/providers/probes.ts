@@ -401,8 +401,35 @@ async function fetchHead(url: string, timeoutMs: number): Promise<Response> {
   }
 }
 
-function extractIp(value: string): string | undefined {
-  return /([0-9]{1,3}(?:\.[0-9]{1,3}){3}|[a-f0-9]{1,4}(?::[a-f0-9]{1,4}){2,7})/i.exec(value)?.[1];
+export function extractIp(value: string): string | undefined {
+  const ipv4 = value.match(/[0-9]{1,3}(?:\.[0-9]{1,3}){3}/g)?.find(isIpv4);
+  if (ipv4) {
+    return ipv4;
+  }
+
+  return value
+    .match(/[a-f0-9:]+/gi)
+    ?.filter((candidate) => candidate.includes(":"))
+    .find(isIpv6);
+}
+
+function isIpv4(candidate: string): boolean {
+  return candidate.split(".").every((part) => Number(part) <= 255);
+}
+
+function isIpv6(candidate: string): boolean {
+  if ((candidate.match(/::/g) || []).length > 1) {
+    return false;
+  }
+
+  const hasCompression = candidate.includes("::");
+  const parts = candidate.split(":");
+  const hextets = parts.filter(Boolean);
+  if (!hextets.every((part) => /^[a-f0-9]{1,4}$/i.test(part))) {
+    return false;
+  }
+
+  return hasCompression ? hextets.length < 8 : hextets.length === 8;
 }
 
 function traceLocationText(colo?: string, locationCode?: string): string {
