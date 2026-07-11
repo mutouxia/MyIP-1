@@ -1,5 +1,10 @@
 import "../styles.css";
-import { connectivityCardConfigs, connectivityCardTarget, probeCardConfigs, probeCardTarget } from "../config/dashboard";
+import {
+  connectivityCardConfigs,
+  connectivityCardTarget,
+  homeProbeCardConfigs,
+  probeCardTarget,
+} from "../config/dashboard";
 import { geoProviders } from "../providers/geo";
 import { connectivityChecks, runConnectivityCheckTwice } from "../providers/connectivity";
 import { probeProviders } from "../providers/probes";
@@ -7,7 +12,9 @@ import type { ConnectivityResult, GeoResult, ProbeResult } from "../types";
 import { renderDashboardCards } from "../ui/cards";
 import { requireElement } from "../ui/dom";
 
-const probeTargets = Object.fromEntries(probeCardConfigs.map((config) => [config.providerId, probeCardTarget(config.providerId)]));
+const probeTargets = Object.fromEntries(
+  homeProbeCardConfigs.map((config) => [config.providerId, probeCardTarget(config.providerId)]),
+);
 const connectivityTargets = Object.fromEntries(
   connectivityCardConfigs.map((config) => [config.checkId, connectivityCardTarget(config.checkId)]),
 );
@@ -28,6 +35,9 @@ for (const target of Object.values(connectivityTargets)) {
 }
 
 for (const provider of probeProviders) {
+  if (!probeTargets[provider.id]) {
+    continue;
+  }
   void provider.query().then((result) => {
     probeResults.set(result.providerId, result);
     renderProbeResult(result);

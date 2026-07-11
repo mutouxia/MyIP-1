@@ -2,26 +2,11 @@
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
-    <meta http-equiv="x-dns-prefetch-control" content="on" />
     <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,minimal-ui" />
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
-    <link rel="preconnect" href="https://ip.mcr.moe" crossorigin />
-    <link rel="preconnect" href="https://ipapi.co" crossorigin />
-    <link rel="preconnect" href="https://myip.ipip.net" crossorigin />
-    <link rel="preconnect" href="https://whois.pconline.com.cn" crossorigin />
-    <link rel="preconnect" href="https://api.ip.sb" crossorigin />
-    <link rel="preconnect" href="https://api.ipify.org" crossorigin />
-    <link rel="dns-prefetch" href="//cdn.jsdelivr.net" />
-    <link rel="dns-prefetch" href="//ip.mcr.moe" />
-    <link rel="dns-prefetch" href="//ipapi.co" />
-    <link rel="dns-prefetch" href="//myip.ipip.net" />
-    <link rel="dns-prefetch" href="//whois.pconline.com.cn" />
-    <link rel="dns-prefetch" href="//api.ip.sb" />
-    <link rel="dns-prefetch" href="//api.ipify.org" />
-    <link rel="shortcut icon" type="image/ico" href="https://cdn.jsdelivr.net/npm/skx@0.0.1" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.7.2/css/bulma.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/suka.css@0.2.1" />
-    <title>IP 地址查询</title>
+    <title>Cloudflare 分流检测</title>
   </head>
   <body>
     <a href="https://github.com/nb5p/MyIP" class="github-corner" aria-label="View source on GitHub">
@@ -40,21 +25,25 @@
       </svg>
     </a>
     <div class="container">
-      <section class="main-section">
-        <h1 class="sk-text-center title page-title">IP 地址查询</h1>
-        <div id="ip-card-rows"></div>
-        <h1 class="sk-text-center title section-title">网站访问检查</h1>
-        <div id="connectivity-card-row" class="columns is-mobile is-multiline"></div>
+      <section class="main-section cloudflare-section">
+        <h1 class="sk-text-center title page-title">Cloudflare 分流检测</h1>
+        <p class="sk-text-center cloudflare-description">
+          查看访问不同 Cloudflare 站点时使用的出口 IP 与接入节点。
+        </p>
+        <div class="box trace-list">
+          <div class="trace-row trace-list-header" aria-hidden="true">
+            <span>站点</span>
+            <span>出口 IP</span>
+            <span>Cloudflare 节点</span>
+          </div>
+          <div id="cloudflare-probe-list"></div>
+        </div>
       </section>
     </div>
     <footer class="page-footer">
-      <a href="./simple/">简洁版</a>
-      <a href="./cloudflare/">Cloudflare 分流</a>
-      <label class="geo-settings">
-        <span>位置来源</span>
-        <select id="geo-provider-select"></select>
-      </label>
+      <a href="../">返回首页</a>
+      <a href="../simple/">简洁版</a>
     </footer>
-    <script type="module" src="./pages/dashboard.ts"></script>
+    <script type="module" src="../pages/cloudflare.ts"></script>
   </body>
 </html>

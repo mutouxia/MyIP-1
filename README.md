@@ -22,6 +22,12 @@ npm run build
 
 The site is built into `dist` and can be deployed directly to GitHub Pages.
 
+Available pages:
+
+- `/` — core IP and connectivity checks
+- `/simple/` — compact legacy view
+- `/cloudflare/` — Cloudflare trace split-tunnel checks
+
 ## Info
 
 - IPIP.net API: `https://myip.ipip.net`

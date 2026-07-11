@@ -3,20 +3,14 @@ import {
   type ProbeCardConfig,
   connectivityCardConfigs,
   connectivityCardTarget,
-  defaultLargeProbeIds,
-  probeCardConfigs,
+  homeProbeCardRows,
   probeCardTarget,
 } from "../config/dashboard";
 import { el, requireElement } from "./dom";
 
 export function renderDashboardCards(): void {
-  const largeProbeCards = probeCardConfigs.filter((config) => defaultLargeProbeIds.has(config.providerId));
-  const compactProbeCards = probeCardConfigs.filter((config) => !defaultLargeProbeIds.has(config.providerId));
   const ipRows = requireElement<HTMLElement>("#ip-card-rows");
-  ipRows.replaceChildren(...chunk(largeProbeCards, 3).map(renderProbeCardRow));
-
-  const compactList = requireElement<HTMLElement>("#compact-ip-card-list");
-  compactList.replaceChildren(renderCompactProbeHeader(), ...compactProbeCards.map(renderCompactProbeCard));
+  ipRows.replaceChildren(...homeProbeCardRows.map(renderProbeCardRow));
 
   const connectivityRow = requireElement<HTMLElement>("#connectivity-card-row");
   connectivityRow.replaceChildren(...connectivityCardConfigs.map(renderConnectivityCard));
@@ -45,37 +39,6 @@ function renderProbeCard(config: ProbeCardConfig): HTMLElement {
   return column;
 }
 
-function renderCompactProbeCard(config: ProbeCardConfig): HTMLElement {
-  const target = probeCardTarget(config.providerId);
-  const card = el("article", { className: "compact-card" });
-  const heading = el("div", { className: "compact-card-heading" });
-  const name = el("span", { className: "compact-card-name", text: config.source.replace(/^数据来自\s*/, "") });
-  const kind = el("span", { className: "compact-card-kind", text: compactKind(config.title) });
-  const ip = el("p", { className: "compact-card-ip" });
-  const geo = el("p", { className: "compact-card-geo" });
-  ip.id = target.ip;
-  geo.id = target.geo;
-  heading.append(name, kind);
-  card.append(heading, ip, geo);
-  return card;
-}
-
-function renderCompactProbeHeader(): HTMLElement {
-  const header = el("div", { className: "compact-card compact-card-header" });
-  header.append(el("span", { text: "网站" }), el("span", { text: "IP" }), el("span", { text: "地理位置" }));
-  return header;
-}
-
-function compactKind(title: string): string {
-  if (title.includes("本机")) {
-    return "本机";
-  }
-  if (title.includes("国内")) {
-    return "国内";
-  }
-  return "国际";
-}
-
 function renderConnectivityCard(config: ConnectivityCardConfig): HTMLElement {
   const column = el("div", { className: "column is-half-mobile" });
   const box = baseCard(config.title, config.source);
@@ -98,12 +61,4 @@ function baseCard(titleText: string, sourceText: string): HTMLElement {
     el("hr", { className: "sk-my-2" }),
   );
   return box;
-}
-
-function chunk<T>(items: T[], size: number): T[][] {
-  const chunks: T[][] = [];
-  for (let index = 0; index < items.length; index += size) {
-    chunks.push(items.slice(index, index + size));
-  }
-  return chunks;
 }

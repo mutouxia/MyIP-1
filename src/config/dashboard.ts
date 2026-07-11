@@ -15,7 +15,7 @@ export interface ProbeCardTarget {
   geo: string;
 }
 
-export const probeCardRows: ProbeCardConfig[][] = [
+export const homeProbeCardRows: ProbeCardConfig[][] = [
   [
     { providerId: "webrtc", title: "从本机查询", source: "数据来自 WebRTC" },
     { providerId: "cn-ipv4", title: "从国内网站查询", source: "数据来自 IP.cn" },
@@ -27,61 +27,12 @@ export const probeCardRows: ProbeCardConfig[][] = [
     { providerId: "bytedance-cn", title: "从国内网站查询", source: "数据来自 字节跳动" },
   ],
   [
-    { providerId: "qualcomm-cn-trace", title: "从国内网站查询", source: "数据来自 高通中国" },
     { providerId: "bytedance-global", title: "从国外网站查询", source: "数据来自 字节跳动" },
-  ],
-  [
     { providerId: "cloudflare-trace", title: "从国外网站查询", source: "数据来自 1.1.1.1" },
     { providerId: "cloudflare-www-trace", title: "从国外网站查询", source: "数据来自 cloudflare.com" },
-    { providerId: "cdnjs-trace", title: "从国外网站查询", source: "数据来自 cdnjs" },
   ],
   [
-    { providerId: "discord-trace", title: "从国外网站查询", source: "数据来自 Discord" },
-    { providerId: "x-trace", title: "从国外网站查询", source: "数据来自 X" },
-    { providerId: "medium-trace", title: "从国外网站查询", source: "数据来自 Medium" },
-  ],
-  [
-    { providerId: "anthropic-trace", title: "从国外网站查询", source: "数据来自 Anthropic" },
     { providerId: "claude-trace", title: "从国外网站查询", source: "数据来自 Claude" },
-    { providerId: "chatgpt-trace", title: "从国外网站查询", source: "数据来自 ChatGPT" },
-  ],
-  [
-    { providerId: "openai-trace", title: "从国外网站查询", source: "数据来自 OpenAI" },
-    { providerId: "sora-trace", title: "从国外网站查询", source: "数据来自 Sora" },
-    { providerId: "grok-trace", title: "从国外网站查询", source: "数据来自 Grok" },
-  ],
-  [
-    { providerId: "pixpix-trace", title: "从国外网站查询", source: "数据来自 PixPix" },
-    { providerId: "perplexity-trace", title: "从国外网站查询", source: "数据来自 Perplexity" },
-    { providerId: "midjourney-trace", title: "从国外网站查询", source: "数据来自 Midjourney" },
-  ],
-  [
-    { providerId: "coinbase-trace", title: "从国外网站查询", source: "数据来自 Coinbase" },
-    { providerId: "okx-trace", title: "从国外网站查询", source: "数据来自 OKX" },
-    { providerId: "crypto-trace", title: "从国外网站查询", source: "数据来自 Crypto.com" },
-  ],
-  [
-    { providerId: "zoom-trace", title: "从国外网站查询", source: "数据来自 Zoom" },
-    { providerId: "onepassword-trace", title: "从国外网站查询", source: "数据来自 1Password" },
-    { providerId: "wise-trace", title: "从国外网站查询", source: "数据来自 Wise" },
-  ],
-  [
-    { providerId: "notion-trace", title: "从国外网站查询", source: "数据来自 Notion" },
-    { providerId: "shopify-trace", title: "从国外网站查询", source: "数据来自 Shopify" },
-    { providerId: "godaddy-trace", title: "从国外网站查询", source: "数据来自 GoDaddy" },
-  ],
-  [
-    { providerId: "producthunt-trace", title: "从国外网站查询", source: "数据来自 Product Hunt" },
-    { providerId: "npm-trace", title: "从国外网站查询", source: "数据来自 npm registry" },
-    { providerId: "kali-trace", title: "从国外网站查询", source: "数据来自 Kali" },
-  ],
-  [
-    { providerId: "unpkg-trace", title: "从国外网站查询", source: "数据来自 unpkg" },
-    { providerId: "nodejs-trace", title: "从国外网站查询", source: "数据来自 Node.js" },
-    { providerId: "gitlab-trace", title: "从国外网站查询", source: "数据来自 GitLab" },
-  ],
-  [
-    { providerId: "crunchyroll-trace", title: "从国外网站查询", source: "数据来自 Crunchyroll" },
     { providerId: "ip-sb", title: "从国外网站查询", source: "数据来自 IP.SB" },
     { providerId: "ipify", title: "从国外网站查询", source: "数据来自 ipify" },
   ],
@@ -90,19 +41,40 @@ export const probeCardRows: ProbeCardConfig[][] = [
   ],
 ];
 
-export const probeCardConfigs = probeCardRows.flat();
+export const cloudflareProbeCardConfigs: ProbeCardConfig[] = [
+  { providerId: "qualcomm-cn-trace", title: "Cloudflare Trace", source: "高通中国" },
+  { providerId: "discord-trace", title: "Cloudflare Trace", source: "Discord" },
+  { providerId: "x-trace", title: "Cloudflare Trace", source: "X" },
+  { providerId: "medium-trace", title: "Cloudflare Trace", source: "Medium" },
+  { providerId: "anthropic-trace", title: "Cloudflare Trace", source: "Anthropic" },
+  { providerId: "chatgpt-trace", title: "Cloudflare Trace", source: "ChatGPT" },
+  { providerId: "openai-trace", title: "Cloudflare Trace", source: "OpenAI" },
+  { providerId: "sora-trace", title: "Cloudflare Trace", source: "Sora" },
+  { providerId: "grok-trace", title: "Cloudflare Trace", source: "Grok" },
+  { providerId: "pixpix-trace", title: "Cloudflare Trace", source: "PixPix" },
+  { providerId: "perplexity-trace", title: "Cloudflare Trace", source: "Perplexity" },
+  { providerId: "midjourney-trace", title: "Cloudflare Trace", source: "Midjourney" },
+  { providerId: "coinbase-trace", title: "Cloudflare Trace", source: "Coinbase" },
+  { providerId: "okx-trace", title: "Cloudflare Trace", source: "OKX" },
+  { providerId: "crypto-trace", title: "Cloudflare Trace", source: "Crypto.com" },
+  { providerId: "zoom-trace", title: "Cloudflare Trace", source: "Zoom" },
+  { providerId: "onepassword-trace", title: "Cloudflare Trace", source: "1Password" },
+  { providerId: "wise-trace", title: "Cloudflare Trace", source: "Wise" },
+  { providerId: "notion-trace", title: "Cloudflare Trace", source: "Notion" },
+  { providerId: "shopify-trace", title: "Cloudflare Trace", source: "Shopify" },
+  { providerId: "godaddy-trace", title: "Cloudflare Trace", source: "GoDaddy" },
+  { providerId: "producthunt-trace", title: "Cloudflare Trace", source: "Product Hunt" },
+  { providerId: "cdnjs-trace", title: "Cloudflare Trace", source: "Cloudflare cdnjs" },
+  { providerId: "npm-trace", title: "Cloudflare Trace", source: "npm registry" },
+  { providerId: "kali-trace", title: "Cloudflare Trace", source: "Kali Download" },
+  { providerId: "unpkg-trace", title: "Cloudflare Trace", source: "unpkg" },
+  { providerId: "nodejs-trace", title: "Cloudflare Trace", source: "Node.js" },
+  { providerId: "gitlab-trace", title: "Cloudflare Trace", source: "GitLab" },
+  { providerId: "crunchyroll-trace", title: "Cloudflare Trace", source: "Crunchyroll" },
+];
 
-export const defaultLargeProbeIds = new Set([
-  "webrtc",
-  "cn-ipv4",
-  "pchome",
-  "ipipnet",
-  "cloudflare-trace",
-  "claude-trace",
-  "ip-sb",
-  "ipify",
-  "ipapi",
-]);
+export const homeProbeCardConfigs = homeProbeCardRows.flat();
+export const probeCardConfigs = [...homeProbeCardConfigs, ...cloudflareProbeCardConfigs];
 
 export const connectivityCardConfigs: ConnectivityCardConfig[] = [
   { checkId: "baidu", title: "百度搜索", source: "国内网站" },
