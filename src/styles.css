@@ -41,6 +41,83 @@ body {
   flex: 1;
 }
 
+.compact-card-list {
+  margin-top: 0.75rem;
+  overflow: hidden;
+  border: 1px solid #dbdbdb;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 1px 4px rgb(10 10 10 / 6%);
+}
+
+.compact-card {
+  display: grid;
+  grid-template-columns: minmax(12rem, 1fr) minmax(10rem, 0.8fr) minmax(16rem, 1.4fr);
+  align-items: center;
+  min-height: 2.9rem;
+  padding: 0.55rem 1rem;
+  border-bottom: 1px solid #ededed;
+}
+
+.compact-card:nth-child(odd) {
+  background: #fafafa;
+}
+
+.compact-card:last-child {
+  border-bottom: 0;
+}
+
+.compact-card-header {
+  min-height: 2.5rem;
+  background: linear-gradient(#f8f9fb, #eef0f3) !important;
+  color: #666;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.compact-card-heading {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.compact-card-name,
+.compact-card-ip,
+.compact-card-geo {
+  overflow-wrap: anywhere;
+}
+
+.compact-card-name {
+  color: #363636;
+  font-weight: 600;
+}
+
+.compact-card-kind {
+  padding: 0.05rem 0.4rem;
+  border-radius: 999px;
+  background: #eef3ff;
+  color: #5772a8;
+  font-size: 0.6875rem;
+  font-weight: 500;
+}
+
+.compact-card-ip,
+.compact-card-geo {
+  margin: 0;
+}
+
+.compact-card-ip {
+  color: #363636;
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.compact-card-geo {
+  color: #666;
+  font-size: 0.875rem;
+}
+
 .http-body {
   min-height: 24px;
 }
@@ -168,7 +245,37 @@ body {
   color: #666;
 }
 
+@media (max-width: 768px) {
+  .compact-card {
+    grid-template-columns: minmax(9rem, 1fr) minmax(8rem, 0.8fr);
+  }
+
+  .compact-card > :nth-child(3),
+  .compact-card-geo {
+    display: none;
+  }
+}
+
 @media (max-width: 500px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .compact-card {
+    grid-template-columns: minmax(7rem, 1fr) minmax(0, 1.2fr);
+    padding: 0.5rem 0.65rem;
+  }
+
+  .compact-card-kind {
+    display: none;
+  }
+
+  .compact-card-ip {
+    padding: 0;
+    text-align: right;
+  }
+
   .github-corner:hover .octo-arm {
     animation: none;
   }

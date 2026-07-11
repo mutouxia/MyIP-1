@@ -90,6 +90,20 @@ export const probeCardRows: ProbeCardConfig[][] = [
   ],
 ];
 
+export const probeCardConfigs = probeCardRows.flat();
+
+export const defaultLargeProbeIds = new Set([
+  "webrtc",
+  "cn-ipv4",
+  "pchome",
+  "ipipnet",
+  "cloudflare-trace",
+  "claude-trace",
+  "ip-sb",
+  "ipify",
+  "ipapi",
+]);
+
 export const connectivityCardConfigs: ConnectivityCardConfig[] = [
   { checkId: "baidu", title: "百度搜索", source: "国内网站" },
   { checkId: "netease-music", title: "网易云音乐", source: "国内网站" },

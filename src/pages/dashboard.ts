@@ -1,5 +1,5 @@
 import "../styles.css";
-import { connectivityCardConfigs, connectivityCardTarget, probeCardRows, probeCardTarget } from "../config/dashboard";
+import { connectivityCardConfigs, connectivityCardTarget, probeCardConfigs, probeCardTarget } from "../config/dashboard";
 import { geoProviders } from "../providers/geo";
 import { connectivityChecks, runConnectivityCheckTwice } from "../providers/connectivity";
 import { probeProviders } from "../providers/probes";
@@ -7,7 +7,7 @@ import type { ConnectivityResult, GeoResult, ProbeResult } from "../types";
 import { renderDashboardCards } from "../ui/cards";
 import { requireElement } from "../ui/dom";
 
-const probeTargets = Object.fromEntries(probeCardRows.flat().map((config) => [config.providerId, probeCardTarget(config.providerId)]));
+const probeTargets = Object.fromEntries(probeCardConfigs.map((config) => [config.providerId, probeCardTarget(config.providerId)]));
 const connectivityTargets = Object.fromEntries(
   connectivityCardConfigs.map((config) => [config.checkId, connectivityCardTarget(config.checkId)]),
 );
