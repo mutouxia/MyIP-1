@@ -1,6 +1,5 @@
 import "../styles.css";
 import { connectivityCardConfigs, connectivityCardTarget, probeCardConfigs, probeCardTarget } from "../config/dashboard";
-import { loadProbeDisplayModes } from "../config/preferences";
 import { geoProviders } from "../providers/geo";
 import { connectivityChecks, runConnectivityCheckTwice } from "../providers/connectivity";
 import { probeProviders } from "../providers/probes";
@@ -8,11 +7,7 @@ import type { ConnectivityResult, GeoResult, ProbeResult } from "../types";
 import { renderDashboardCards } from "../ui/cards";
 import { requireElement } from "../ui/dom";
 
-const probeModes = loadProbeDisplayModes(probeCardConfigs.map((config) => config.providerId));
-const visibleProbeConfigs = probeCardConfigs.filter((config) => probeModes[config.providerId] !== "hidden");
-const probeTargets = Object.fromEntries(
-  visibleProbeConfigs.map((config) => [config.providerId, probeCardTarget(config.providerId)]),
-);
+const probeTargets = Object.fromEntries(probeCardConfigs.map((config) => [config.providerId, probeCardTarget(config.providerId)]));
 const connectivityTargets = Object.fromEntries(
   connectivityCardConfigs.map((config) => [config.checkId, connectivityCardTarget(config.checkId)]),
 );
@@ -20,7 +15,7 @@ const probeResults = new Map<string, ProbeResult>();
 const geoProviderSelect = requireElement<HTMLSelectElement>("#geo-provider-select");
 const originalGeoOptionId = "__original";
 
-renderDashboardCards(probeModes);
+renderDashboardCards();
 renderGeoProviderSelect();
 
 for (const target of Object.values(probeTargets)) {
@@ -33,9 +28,6 @@ for (const target of Object.values(connectivityTargets)) {
 }
 
 for (const provider of probeProviders) {
-  if (!probeTargets[provider.id]) {
-    continue;
-  }
   void provider.query().then((result) => {
     probeResults.set(result.providerId, result);
     renderProbeResult(result);

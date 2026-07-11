@@ -22,9 +22,6 @@ npm run build
 
 The site is built into `dist` and can be deployed directly to GitHub Pages.
 
-Display preferences are available at `settings/`. They are stored locally in the
-browser, so the site remains fully static; probes marked as hidden are not requested.
-
 ## Info
 
 - IPIP.net API: `https://myip.ipip.net`
