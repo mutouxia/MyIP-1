@@ -7,15 +7,19 @@ import {
   probeCardConfigs,
   probeCardTarget,
 } from "../config/dashboard";
+import type { CardDisplayMode } from "../config/preferences";
 import { el, requireElement } from "./dom";
 
-export function renderDashboardCards(): void {
-  const largeProbeCards = probeCardConfigs.filter((config) => defaultLargeProbeIds.has(config.providerId));
-  const compactProbeCards = probeCardConfigs.filter((config) => !defaultLargeProbeIds.has(config.providerId));
+export function renderDashboardCards(probeModes?: Record<string, CardDisplayMode>): void {
+  const modeFor = (providerId: string): CardDisplayMode =>
+    probeModes?.[providerId] || (defaultLargeProbeIds.has(providerId) ? "large" : "compact");
+  const largeProbeCards = probeCardConfigs.filter((config) => modeFor(config.providerId) === "large");
+  const compactProbeCards = probeCardConfigs.filter((config) => modeFor(config.providerId) === "compact");
   const ipRows = requireElement<HTMLElement>("#ip-card-rows");
   ipRows.replaceChildren(...chunk(largeProbeCards, 3).map(renderProbeCardRow));
 
   const compactList = requireElement<HTMLElement>("#compact-ip-card-list");
+  compactList.hidden = compactProbeCards.length === 0;
   compactList.replaceChildren(renderCompactProbeHeader(), ...compactProbeCards.map(renderCompactProbeCard));
 
   const connectivityRow = requireElement<HTMLElement>("#connectivity-card-row");

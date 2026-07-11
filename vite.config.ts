@@ -12,6 +12,7 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, "src/index.html"),
         simple: resolve(__dirname, "src/simple/index.html"),
+        settings: resolve(__dirname, "src/settings/index.html"),
       },
     },
   },
