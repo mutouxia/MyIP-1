@@ -1,19 +1,58 @@
 import {
   type ConnectivityCardConfig,
   type ProbeCardConfig,
+  type ProbeCardSection,
   connectivityCardConfigs,
   connectivityCardTarget,
-  homeProbeCardRows,
+  homeProbeCardSections,
   probeCardTarget,
 } from "../config/dashboard";
+import type { WebRtcDisplayMode } from "../config/webrtc-preference";
 import { el, requireElement } from "./dom";
 
-export function renderDashboardCards(): void {
+export function renderDashboardCards(webrtcDisplayMode: WebRtcDisplayMode): void {
   const ipRows = requireElement<HTMLElement>("#ip-card-rows");
-  ipRows.replaceChildren(...homeProbeCardRows.map(renderProbeCardRow));
+  const visibleSections = homeProbeCardSections.filter(
+    (section) => webrtcDisplayMode !== "off" || !containsWebRtc(section),
+  );
+  ipRows.replaceChildren(...visibleSections.map((section) => renderProbeCardSection(section, webrtcDisplayMode)));
 
   const connectivityRow = requireElement<HTMLElement>("#connectivity-card-row");
   connectivityRow.replaceChildren(...connectivityCardConfigs.map(renderConnectivityCard));
+}
+
+export function revealProbeCard(providerId: string): void {
+  const column = document.querySelector<HTMLElement>(`[data-provider-id="${providerId}"]`);
+  if (!column) {
+    return;
+  }
+
+  const section = column.closest<HTMLElement>(".probe-card-section");
+  if (section?.classList.contains("probe-card-section--deferred")) {
+    section.classList.add("is-visible");
+    section.removeAttribute("aria-hidden");
+  }
+}
+
+function renderProbeCardSection(config: ProbeCardSection, webrtcDisplayMode: WebRtcDisplayMode): HTMLElement {
+  const isDeferred = containsWebRtc(config) && webrtcDisplayMode === "auto";
+  const section = el("section", {
+    className: `probe-card-section${isDeferred ? " probe-card-section--deferred" : ""}`,
+  });
+  const content = isDeferred ? el("div", { className: "probe-card-section-content" }) : section;
+  if (config.title) {
+    content.append(el("h2", { className: "sk-text-center sk-text-bold subtitle probe-section-title", text: config.title }));
+  }
+  content.append(...config.rows.map(renderProbeCardRow));
+  if (isDeferred) {
+    section.setAttribute("aria-hidden", "true");
+    section.append(content);
+  }
+  return section;
+}
+
+function containsWebRtc(config: ProbeCardSection): boolean {
+  return config.rows.flat().some((card) => card.providerId === "webrtc");
 }
 
 function renderProbeCardRow(cards: ProbeCardConfig[]): HTMLElement {
@@ -25,6 +64,7 @@ function renderProbeCardRow(cards: ProbeCardConfig[]): HTMLElement {
 function renderProbeCard(config: ProbeCardConfig): HTMLElement {
   const target = probeCardTarget(config.providerId);
   const column = el("div", { className: "column" });
+  column.dataset.providerId = config.providerId;
   const box = baseCard(config.title, config.source);
   const body = el("div", { className: "ip-body" });
   const text = el("div", { className: "sk-text-center" });

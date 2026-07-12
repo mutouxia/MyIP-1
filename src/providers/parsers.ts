@@ -42,6 +42,21 @@ export interface IpapiResponse {
   org?: string;
 }
 
+export interface IpbaseResponse {
+  ip?: string;
+  country_name?: string;
+  region_name?: string;
+  city?: string;
+}
+
+export interface UApiProMyIpResponse {
+  ip?: string;
+  region?: string;
+  isp?: string;
+  llc?: string;
+  asn?: string;
+}
+
 export interface MoeIpResponse {
   country?: string;
   area?: string;
@@ -53,7 +68,7 @@ export function parseIpipNetText(text: string): IpipNetParsed {
   const [ip = "", locationText = ""] = normalized.split(/\s+来自于：?\s*/);
 
   if (!ip.trim()) {
-    throw new Error("IPIP.net 未返回 IP");
+    throw new Error("ipip.net 未返回 IP");
   }
 
   return {
@@ -89,7 +104,7 @@ export function parseCloudflareTrace(text: string): TraceParsed {
 export function parseIpCnText(text: string): IpCnParsed {
   const match = text.match(/ip：?\s*([0-9.]+)\s+归属地：?\s*(.+)/i);
   if (!match?.[1]) {
-    throw new Error("IP.cn 未返回 IPv4");
+    throw new Error("ip.cn 未返回 IPv4");
   }
 
   return {
@@ -131,6 +146,31 @@ export function normalizeIpapiGeo(data: IpapiResponse, providerId = "ipapi"): Ge
     region: data.region,
     city: data.city,
     isp: data.org,
+    raw: data,
+    status: "success",
+    durationMs: 0,
+  };
+}
+
+export function normalizeIpbaseGeo(data: IpbaseResponse, providerId = "ipbase"): GeoResult {
+  return {
+    providerId,
+    locationText: compact([data.country_name, data.region_name, data.city]),
+    country: data.country_name,
+    region: data.region_name,
+    city: data.city,
+    raw: data,
+    status: "success",
+    durationMs: 0,
+  };
+}
+
+export function normalizeUApiProGeo(data: UApiProMyIpResponse, providerId = "uapipro"): GeoResult {
+  return {
+    providerId,
+    locationText: compact([data.region, data.llc || data.isp]),
+    region: data.region,
+    isp: data.llc || data.isp,
     raw: data,
     status: "success",
     durationMs: 0,

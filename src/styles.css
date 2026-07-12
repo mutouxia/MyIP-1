@@ -41,6 +41,165 @@ body {
   flex: 1;
 }
 
+.probe-section-title {
+  margin: 1.5rem 0 1rem !important;
+  color: #444;
+}
+
+.probe-card-section--deferred {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transform: translateY(-0.5rem);
+  transition:
+    grid-template-rows 450ms ease,
+    opacity 300ms ease 100ms,
+    transform 450ms ease;
+}
+
+.probe-card-section--deferred > .probe-card-section-content {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.probe-card-section--deferred.is-visible {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.settings-page {
+  background: #fafafa;
+}
+
+.settings-container {
+  width: min(36rem, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 4rem 0;
+}
+
+.settings-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.settings-title {
+  margin-bottom: 0.5rem !important;
+}
+
+.settings-description,
+.settings-back-link,
+.settings-status {
+  color: #666;
+}
+
+.settings-back-link {
+  flex: none;
+  padding-top: 0.4rem;
+}
+
+.settings-panel {
+  padding: 1.25rem !important;
+}
+
+.settings-row {
+  display: grid;
+  grid-template-columns: minmax(6rem, 0.7fr) minmax(15rem, 1.5fr);
+  align-items: center;
+  gap: 1rem;
+}
+
+.settings-item-label {
+  font-weight: 600;
+}
+
+.webrtc-mode-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  overflow: hidden;
+  border: 1px solid #d8d8d8;
+  border-radius: 5px;
+}
+
+.webrtc-mode-option {
+  position: relative;
+  cursor: pointer;
+}
+
+.webrtc-mode-option + .webrtc-mode-option {
+  border-left: 1px solid #d8d8d8;
+}
+
+.webrtc-mode-option input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.webrtc-mode-option span {
+  display: block;
+  padding: 0.55rem 0.65rem;
+  color: #555;
+  font-size: 0.875rem;
+  text-align: center;
+  transition: color 150ms ease, background-color 150ms ease;
+}
+
+.webrtc-mode-option:hover span {
+  background: #f5f5f5;
+}
+
+.webrtc-mode-option input:checked + span {
+  background: #444;
+  color: #fff;
+}
+
+.webrtc-mode-option input:focus-visible + span {
+  outline: 2px solid #3273dc;
+  outline-offset: -2px;
+}
+
+.settings-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.settings-status {
+  font-size: 0.875rem;
+}
+
+.settings-status.is-error {
+  color: #c33;
+}
+
+@media (max-width: 480px) {
+  .settings-container {
+    padding: 2rem 0;
+  }
+
+  .settings-header {
+    gap: 1rem;
+  }
+
+  .settings-row {
+    grid-template-columns: 1fr;
+    gap: 0.65rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .probe-card-section--deferred {
+    transition: none;
+  }
+}
+
 .cloudflare-description {
   margin: -0.75rem auto 2rem;
   color: #666;

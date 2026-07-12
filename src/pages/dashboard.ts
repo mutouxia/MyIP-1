@@ -5,15 +5,20 @@ import {
   homeProbeCardConfigs,
   probeCardTarget,
 } from "../config/dashboard";
+import { loadWebRtcDisplayMode } from "../config/webrtc-preference";
 import { geoProviders } from "../providers/geo";
 import { connectivityChecks, runConnectivityCheckTwice } from "../providers/connectivity";
 import { probeProviders } from "../providers/probes";
-import type { ConnectivityResult, GeoResult, ProbeResult } from "../types";
-import { renderDashboardCards } from "../ui/cards";
+import type { ConnectivityResult, ProbeResult } from "../types";
+import { renderDashboardCards, revealProbeCard } from "../ui/cards";
 import { requireElement } from "../ui/dom";
 
+const webrtcDisplayMode = loadWebRtcDisplayMode();
+const activeProbeCardConfigs = homeProbeCardConfigs.filter(
+  (config) => config.providerId !== "webrtc" || webrtcDisplayMode !== "off",
+);
 const probeTargets = Object.fromEntries(
-  homeProbeCardConfigs.map((config) => [config.providerId, probeCardTarget(config.providerId)]),
+  activeProbeCardConfigs.map((config) => [config.providerId, probeCardTarget(config.providerId)]),
 );
 const connectivityTargets = Object.fromEntries(
   connectivityCardConfigs.map((config) => [config.checkId, connectivityCardTarget(config.checkId)]),
@@ -22,7 +27,7 @@ const probeResults = new Map<string, ProbeResult>();
 const geoProviderSelect = requireElement<HTMLSelectElement>("#geo-provider-select");
 const originalGeoOptionId = "__original";
 
-renderDashboardCards();
+renderDashboardCards(webrtcDisplayMode);
 renderGeoProviderSelect();
 
 for (const target of Object.values(probeTargets)) {
@@ -57,6 +62,10 @@ function renderProbeResult(result: ProbeResult): void {
 
   setText(target.ip, result.status === "success" ? result.ip || "N/A" : "N/A");
   setText(target.geo, result.status === "success" ? result.geo?.locationText || "不包含地理位置" : result.error || "查询失败");
+
+  if (result.providerId === "webrtc" && result.status === "success" && webrtcDisplayMode === "auto") {
+    revealProbeCard(result.providerId);
+  }
 }
 
 function renderGeoProviderSelect(): void {
@@ -96,7 +105,7 @@ async function renderSelectedGeo(result: ProbeResult): Promise<void> {
     if (geoProviderSelect.value !== selectedProviderId) {
       return;
     }
-    setText(target.geo, formatGeoResults([geoResult]));
+    setText(target.geo, geoResult.status === "success" ? geoResult.locationText : "归属地查询失败");
     return;
   }
 
@@ -114,33 +123,6 @@ function selectedGeoProvider() {
   }
 
   return geoProviders.find((provider) => provider.id === geoProviderSelect.value);
-}
-
-function formatGeoResults(results: GeoResult[]): string {
-  const lines = results
-    .map((result) => (result.status === "success" ? `${providerName(result.providerId)}: ${result.locationText}` : ""))
-    .filter(Boolean);
-
-  if (lines.length > 0) {
-    return lines.join(" / ");
-  }
-
-  return "归属地查询失败";
-}
-
-function providerName(providerId: string): string {
-  const embeddedProviderNames: Record<string, string> = {
-    "cn-ipv4": "IP.cn",
-    ipipnet: "IPIP.net",
-    pchome: "PChome",
-    "ip-sb": "IP.SB",
-    ipapi: "ipapi",
-    webrtc: "WebRTC",
-    "cloudflare-trace": "Trace",
-    "claude-trace": "Trace",
-  };
-
-  return geoProviders.find((provider) => provider.id === providerId)?.name || embeddedProviderNames[providerId] || providerId;
 }
 
 function renderConnectivityResult(result: ConnectivityResult): void {

@@ -1,12 +1,17 @@
 import { cacheBust, fetchJson, fetchText, loadScript, RequestError } from "../lib/http";
+import { formatCloudflareColo } from "../config/cloudflare-colos";
 import { errorMessage, measure } from "../lib/timing";
 import type { GeoResult, ProbeProvider, ProbeResult } from "../types";
 import {
   type IpSbResponse,
   type IpapiResponse,
+  type IpbaseResponse,
   type PchomeResponse,
+  type UApiProMyIpResponse,
   normalizeIpSbGeo,
   normalizeIpapiGeo,
+  normalizeIpbaseGeo,
+  normalizeUApiProGeo,
   parseCloudflareTrace,
   parseIpCnText,
   parseIpipNetText,
@@ -62,16 +67,6 @@ export const probeProviders: ProbeProvider[] = [
       }
     },
   },
-  {
-    id: "cloudflare-trace",
-    name: "Cloudflare 出口 IP",
-    group: "海外",
-    homepage: "https://1.1.1.1/cdn-cgi/trace",
-    description: "从 1.1.1.1 的 Cloudflare trace 获取访问 Cloudflare 时的出口 IP。",
-    async query() {
-      return traceProbe("cloudflare-trace", "https://1.1.1.1/cdn-cgi/trace");
-    },
-  },
   ...cloudflareTraceProviders([
     ["qualcomm-cn-trace", "高通中国", "国内", "www.qualcomm.cn", "从 www.qualcomm.cn 的 Cloudflare trace 获取访问高通中国时的出口 IP。"],
   ]),
@@ -95,16 +90,6 @@ export const probeProviders: ProbeProvider[] = [
     description: "从字节跳动 perfops 测试资源响应头获取出口 IP。",
     async query() {
       return headerProbe("bytedance-cn", "https://perfops.byte-test.com/500b-bench.jpg", ["x-request-ip", "x-response-cinfo"]);
-    },
-  },
-  {
-    id: "bytedance-global",
-    name: "字节跳动",
-    group: "海外",
-    homepage: "https://perfops2.byte-test.com/",
-    description: "从字节跳动 perfops2 测试资源响应头获取出口 IP。",
-    async query() {
-      return headerProbe("bytedance-global", "https://perfops2.byte-test.com/500b-bench.jpg", ["x-request-ip", "x-response-cinfo"]);
     },
   },
   {
@@ -139,7 +124,6 @@ export const probeProviders: ProbeProvider[] = [
     ["shopify-trace", "Shopify", "海外", "shopify.com", "从 shopify.com 的 Cloudflare trace 获取出口 IP。"],
     ["godaddy-trace", "GoDaddy", "海外", "godaddy.com", "从 godaddy.com 的 Cloudflare trace 获取出口 IP。"],
     ["producthunt-trace", "Product Hunt", "海外", "producthunt.com", "从 producthunt.com 的 Cloudflare trace 获取出口 IP。"],
-    ["cloudflare-www-trace", "Cloudflare", "海外", "www.cloudflare.com", "从 www.cloudflare.com 的 Cloudflare trace 获取出口 IP。"],
     ["cdnjs-trace", "Cloudflare cdnjs", "海外", "cdnjs.cloudflare.com", "从 cdnjs.cloudflare.com 的 Cloudflare trace 获取出口 IP。"],
     ["npm-trace", "npm registry", "海外", "registry.npmjs.org", "从 registry.npmjs.org 的 Cloudflare trace 获取出口 IP。"],
     ["kali-trace", "Kali Download", "海外", "kali.download", "从 kali.download 的 Cloudflare trace 获取出口 IP。"],
@@ -195,10 +179,10 @@ export const probeProviders: ProbeProvider[] = [
   },
   {
     id: "ipipnet",
-    name: "IPIP.net",
+    name: "ipip.net",
     group: "国内",
     homepage: "https://myip.ipip.net/",
-    description: "从 IPIP.net 查询当前访问该服务时的出口 IP。",
+    description: "从 ipip.net 查询当前访问该服务时的出口 IP。",
     async query() {
       const startedAt = performance.now();
       try {
@@ -218,17 +202,45 @@ export const probeProviders: ProbeProvider[] = [
     },
   },
   {
+    id: "uapipro",
+    name: "UApiPro",
+    group: "国内",
+    homepage: "https://uapis.cn/docs/api-reference/get-network-myip",
+    description: "从 UApiPro 查询当前中国出口 IP 和网络归属信息。",
+    async query() {
+      const startedAt = performance.now();
+      try {
+        const { value: data, durationMs } = await measure(() =>
+          fetchJson<UApiProMyIpResponse>("https://uapis.cn/api/v1/network/myip"),
+        );
+        if (!data.ip) {
+          throw new Error("UApiPro 未返回 IP");
+        }
+        return {
+          providerId: "uapipro",
+          ip: data.ip,
+          geo: { ...normalizeUApiProGeo(data), durationMs },
+          raw: data,
+          status: "success",
+          durationMs,
+        };
+      } catch (error) {
+        return failure("uapipro", Math.round(performance.now() - startedAt), error);
+      }
+    },
+  },
+  {
     id: "ip-sb",
-    name: "IP.SB",
+    name: "ip.sb",
     group: "海外",
     homepage: "https://ip.sb/",
-    description: "从 IP.SB 查询出口 IP 和内置归属信息。",
+    description: "从 ip.sb 查询出口 IP 和内置归属信息。",
     async query() {
       const startedAt = performance.now();
       try {
         const { value: data, durationMs } = await measure(() => fetchJson<IpSbResponse>("https://api.ip.sb/geoip"));
         if (!data.ip) {
-          throw new Error("IP.SB 未返回 IP");
+          throw new Error("ip.sb 未返回 IP");
         }
         return {
           providerId: "ip-sb",
@@ -244,42 +256,17 @@ export const probeProviders: ProbeProvider[] = [
     },
   },
   {
-    id: "ipify",
-    name: "ipify",
-    group: "海外",
-    homepage: "https://www.ipify.org/",
-    description: "从 ipify 获取出口 IP。",
-    async query() {
-      const startedAt = performance.now();
-      try {
-        const { value: data, durationMs } = await measure(() => fetchJson<{ ip?: string }>("https://api.ipify.org/?format=json"));
-        if (!data.ip) {
-          throw new Error("ipify 未返回 IP");
-        }
-        return {
-          providerId: "ipify",
-          ip: data.ip,
-          raw: data,
-          status: "success",
-          durationMs,
-        };
-      } catch (error) {
-        return failure("ipify", Math.round(performance.now() - startedAt), error);
-      }
-    },
-  },
-  {
     id: "ipapi",
-    name: "ipapi",
+    name: "ipapi.co",
     group: "海外",
     homepage: "https://ipapi.co/",
-    description: "从 ipapi 查询出口 IP 和内置归属信息。",
+    description: "从 ipapi.co 查询出口 IP 和内置归属信息。",
     async query() {
       const startedAt = performance.now();
       try {
         const { value: data, durationMs } = await measure(() => fetchJson<IpapiResponse>("https://ipapi.co/json"));
         if (!data.ip) {
-          throw new Error("ipapi 未返回 IP");
+          throw new Error("ipapi.co 未返回 IP");
         }
         return {
           providerId: "ipapi",
@@ -291,6 +278,34 @@ export const probeProviders: ProbeProvider[] = [
         };
       } catch (error) {
         return failure("ipapi", Math.round(performance.now() - startedAt), error);
+      }
+    },
+  },
+  {
+    id: "ipbase",
+    name: "ipbase.com",
+    group: "海外",
+    homepage: "https://ipbase.com/",
+    description: "从 ipbase.com 查询出口 IP 和内置归属信息。",
+    async query() {
+      const startedAt = performance.now();
+      try {
+        const { value: data, durationMs } = await measure(() =>
+          fetchJson<IpbaseResponse>("https://api.ipbase.com/v1/json"),
+        );
+        if (!data.ip) {
+          throw new Error("ipbase.com 未返回 IP");
+        }
+        return {
+          providerId: "ipbase",
+          ip: data.ip,
+          geo: { ...normalizeIpbaseGeo(data), durationMs },
+          raw: data,
+          status: "success",
+          durationMs,
+        };
+      } catch (error) {
+        return failure("ipbase", Math.round(performance.now() - startedAt), error);
       }
     },
   },
@@ -432,12 +447,9 @@ function isIpv6(candidate: string): boolean {
 }
 
 function traceLocationText(colo?: string, locationCode?: string): string {
-  const coloNameByCode: Record<string, string> = {
-    SJC: "San Jose",
-  };
   const normalizedColo = colo?.toUpperCase();
   if (normalizedColo) {
-    return `Cloudflare ${coloNameByCode[normalizedColo] || normalizedColo} (${normalizedColo})`;
+    return `Cloudflare ${formatCloudflareColo(normalizedColo)}`;
   }
   return locationCode ? `Cloudflare ${locationCode.toUpperCase()}` : "未知归属";
 }
@@ -448,10 +460,10 @@ async function fetchCnIp(): Promise<{ ip: string; locationText: string; raw: str
     return {
       ...parseIpCnText(text),
       raw: text,
-      source: "IP.cn",
+      source: "ip.cn",
     };
   } catch {
-    // Fall back to IP138 if IP.cn is unavailable.
+    // Fall back to IP138 if ip.cn is unavailable.
   }
 
   try {

@@ -15,30 +15,55 @@ export interface ProbeCardTarget {
   geo: string;
 }
 
-export const homeProbeCardRows: ProbeCardConfig[][] = [
-  [
-    { providerId: "webrtc", title: "从本机查询", source: "数据来自 WebRTC" },
-    { providerId: "cn-ipv4", title: "从国内网站查询", source: "数据来自 IP.cn" },
-    { providerId: "pchome", title: "从国内网站查询", source: "数据来自 PChome" },
-  ],
-  [
-    { providerId: "ipipnet", title: "从国内网站查询", source: "数据来自 IPIP.net" },
-    { providerId: "netease-cdn", title: "从国内网站查询", source: "数据来自 网易 CDN" },
-    { providerId: "bytedance-cn", title: "从国内网站查询", source: "数据来自 字节跳动" },
-  ],
-  [
-    { providerId: "bytedance-global", title: "从国外网站查询", source: "数据来自 字节跳动" },
-    { providerId: "cloudflare-trace", title: "从国外网站查询", source: "数据来自 1.1.1.1" },
-    { providerId: "cloudflare-www-trace", title: "从国外网站查询", source: "数据来自 cloudflare.com" },
-  ],
-  [
-    { providerId: "claude-trace", title: "从国外网站查询", source: "数据来自 Claude" },
-    { providerId: "ip-sb", title: "从国外网站查询", source: "数据来自 IP.SB" },
-    { providerId: "ipify", title: "从国外网站查询", source: "数据来自 ipify" },
-  ],
-  [
-    { providerId: "ipapi", title: "从国外网站查询", source: "数据来自 ipapi" },
-  ],
+export interface ProbeCardSection {
+  title?: string;
+  rows: ProbeCardConfig[][];
+}
+
+export const homeProbeCardSections: ProbeCardSection[] = [
+  {
+    rows: [[{ providerId: "webrtc", title: "从本机查询", source: "数据来自 WebRTC" }]],
+  },
+  {
+    title: "国内网站出口",
+    rows: [
+      [
+        { providerId: "netease-cdn", title: "从国内网站查询", source: "数据来自 网易 CDN" },
+        { providerId: "bytedance-cn", title: "从国内网站查询", source: "数据来自 字节跳动" },
+        { providerId: "pchome", title: "从国内网站查询", source: "数据来自 PChome" },
+      ],
+    ],
+  },
+  {
+    title: "国内 IP 查询",
+    rows: [
+      [
+        { providerId: "cn-ipv4", title: "从国内网站查询", source: "数据来自 ip.cn" },
+        { providerId: "ipipnet", title: "从国内网站查询", source: "数据来自 ipip.net" },
+        { providerId: "uapipro", title: "从国内网站查询", source: "数据来自 UApiPro" },
+      ],
+    ],
+  },
+  {
+    title: "海外 AI 服务",
+    rows: [
+      [
+        { providerId: "chatgpt-trace", title: "从国外网站查询", source: "数据来自 ChatGPT" },
+        { providerId: "claude-trace", title: "从国外网站查询", source: "数据来自 Claude" },
+        { providerId: "grok-trace", title: "从国外网站查询", source: "数据来自 Grok" },
+      ],
+    ],
+  },
+  {
+    title: "海外 IP 查询",
+    rows: [
+      [
+        { providerId: "ip-sb", title: "从国外网站查询", source: "数据来自 ip.sb" },
+        { providerId: "ipapi", title: "从国外网站查询", source: "数据来自 ipapi.co" },
+        { providerId: "ipbase", title: "从国外网站查询", source: "数据来自 ipbase.com" },
+      ],
+    ],
+  },
 ];
 
 export const cloudflareProbeCardConfigs: ProbeCardConfig[] = [
@@ -47,10 +72,8 @@ export const cloudflareProbeCardConfigs: ProbeCardConfig[] = [
   { providerId: "x-trace", title: "Cloudflare Trace", source: "X" },
   { providerId: "medium-trace", title: "Cloudflare Trace", source: "Medium" },
   { providerId: "anthropic-trace", title: "Cloudflare Trace", source: "Anthropic" },
-  { providerId: "chatgpt-trace", title: "Cloudflare Trace", source: "ChatGPT" },
   { providerId: "openai-trace", title: "Cloudflare Trace", source: "OpenAI" },
   { providerId: "sora-trace", title: "Cloudflare Trace", source: "Sora" },
-  { providerId: "grok-trace", title: "Cloudflare Trace", source: "Grok" },
   { providerId: "pixpix-trace", title: "Cloudflare Trace", source: "PixPix" },
   { providerId: "perplexity-trace", title: "Cloudflare Trace", source: "Perplexity" },
   { providerId: "midjourney-trace", title: "Cloudflare Trace", source: "Midjourney" },
@@ -73,6 +96,7 @@ export const cloudflareProbeCardConfigs: ProbeCardConfig[] = [
   { providerId: "crunchyroll-trace", title: "Cloudflare Trace", source: "Crunchyroll" },
 ];
 
+export const homeProbeCardRows = homeProbeCardSections.flatMap((section) => section.rows);
 export const homeProbeCardConfigs = homeProbeCardRows.flat();
 export const probeCardConfigs = [...homeProbeCardConfigs, ...cloudflareProbeCardConfigs];
 
@@ -105,14 +129,13 @@ export function connectivityCardTarget(checkId: string): string {
 function providerDomId(providerId: string): string {
   const targetByProviderId: Record<string, string> = {
     "cn-ipv4": "cn-ipv4",
-    "cloudflare-trace": "cloudflare",
     "claude-trace": "claude",
     webrtc: "webrtc",
     ipipnet: "ipipnet",
     pchome: "pchome",
     "ip-sb": "ipsb",
-    ipify: "ipify",
     ipapi: "ipapi",
+    ipbase: "ipbase",
   };
 
   return targetByProviderId[providerId] || providerId.replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "");

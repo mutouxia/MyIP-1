@@ -9,7 +9,6 @@ const probeTargets: Record<string, { ip: string; geo?: string; enabledInSimple: 
   ipipnet: { ip: "ip-ipipnet", enabledInSimple: true },
   pchome: { ip: "ip-pchome", geo: "ip-pchome-geo", enabledInSimple: true },
   "ip-sb": { ip: "ip-ipsb", geo: "ip-ipsb-geo", enabledInSimple: true },
-  ipify: { ip: "ip-ipify", geo: "ip-ipify-geo", enabledInSimple: false },
   ipapi: { ip: "ip-ipapi", geo: "ip-ipapi-geo", enabledInSimple: true },
 };
 

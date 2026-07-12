@@ -61,16 +61,16 @@ export const geoProviders: GeoProvider[] = [
   createGeoProvider<MoeIpResponse>(
     {
       id: "moe-ip",
-      name: "Moe IP",
-      homepage: "https://ip.mcr.moe/",
+      name: "ip-moe.zerodream.net",
+      homepage: "https://ip-moe.zerodream.net/",
     },
-    (ip) => `https://ip.mcr.moe/?ip=${encodeURIComponent(ip)}&unicode`,
+    (ip) => `https://ip-moe.zerodream.net/?ip=${encodeURIComponent(ip)}&unicode`,
     normalizeMoeIpGeo,
   ),
   createGeoProvider<IpapiResponse>(
     {
       id: "ipapi",
-      name: "ipapi",
+      name: "ipapi.co",
       homepage: "https://ipapi.co/",
     },
     (ip) => `https://ipapi.co/${encodeURIComponent(ip)}/json`,
@@ -79,7 +79,7 @@ export const geoProviders: GeoProvider[] = [
   createGeoProvider<IpSbResponse>(
     {
       id: "ip-sb",
-      name: "IP.SB",
+      name: "ip.sb",
       homepage: "https://ip.sb/",
     },
     (ip) => `https://api.ip.sb/geoip/${encodeURIComponent(ip)}`,
