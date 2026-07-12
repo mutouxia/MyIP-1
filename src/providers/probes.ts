@@ -1,7 +1,8 @@
 import { cacheBust, fetchJson, fetchText, loadScript, RequestError } from "../lib/http";
-import { formatCloudflareColo } from "../config/cloudflare-colos";
+import { builtInCloudflareProbes, homeCloudflareProbeIds } from "../config/cloudflare-probes";
 import { errorMessage, measure } from "../lib/timing";
 import type { GeoResult, ProbeProvider, ProbeResult } from "../types";
+import { queryCloudflareProbe } from "./cloudflare";
 import {
   type IpSbResponse,
   type IpapiResponse,
@@ -12,7 +13,6 @@ import {
   normalizeIpapiGeo,
   normalizeIpbaseGeo,
   normalizeUApiProGeo,
-  parseCloudflareTrace,
   parseIpCnText,
   parseIpipNetText,
   parsePchomeResponse,
@@ -67,9 +67,6 @@ export const probeProviders: ProbeProvider[] = [
       }
     },
   },
-  ...cloudflareTraceProviders([
-    ["qualcomm-cn-trace", "高通中国", "国内", "www.qualcomm.cn", "从 www.qualcomm.cn 的 Cloudflare trace 获取访问高通中国时的出口 IP。"],
-  ]),
   {
     id: "netease-cdn",
     name: "网易",
@@ -92,46 +89,7 @@ export const probeProviders: ProbeProvider[] = [
       return headerProbe("bytedance-cn", "https://perfops.byte-test.com/500b-bench.jpg", ["x-request-ip", "x-response-cinfo"]);
     },
   },
-  {
-    id: "claude-trace",
-    name: "Claude AI 出口 IP",
-    group: "海外",
-    homepage: "https://claude.ai/cdn-cgi/trace",
-    description: "从 claude.ai 的 Cloudflare trace 获取访问 Claude AI 时的出口 IP。",
-    async query() {
-      return traceProbe("claude-trace", "https://claude.ai/cdn-cgi/trace");
-    },
-  },
-  ...cloudflareTraceProviders([
-    ["discord-trace", "Discord", "海外", "discord.com", "从 discord.com 的 Cloudflare trace 获取出口 IP。", "gateway.discord.gg"],
-    ["x-trace", "X", "海外", "x.com", "从 x.com 的 Cloudflare trace 获取出口 IP。"],
-    ["medium-trace", "Medium", "海外", "medium.com", "从 medium.com 的 Cloudflare trace 获取出口 IP。"],
-    ["anthropic-trace", "Anthropic", "海外", "anthropic.com", "从 anthropic.com 的 Cloudflare trace 获取出口 IP。"],
-    ["chatgpt-trace", "ChatGPT", "海外", "chatgpt.com", "从 chatgpt.com 的 Cloudflare trace 获取出口 IP。"],
-    ["openai-trace", "OpenAI", "海外", "openai.com", "从 openai.com 的 Cloudflare trace 获取出口 IP。"],
-    ["sora-trace", "Sora", "海外", "sora.com", "从 sora.com 的 Cloudflare trace 获取出口 IP。"],
-    ["grok-trace", "Grok", "海外", "grok.com", "从 grok.com 的 Cloudflare trace 获取出口 IP。"],
-    ["pixpix-trace", "PixPix", "海外", "pixpix.com", "从 pixpix.com 的 Cloudflare trace 获取出口 IP。"],
-    ["perplexity-trace", "Perplexity", "海外", "www.perplexity.ai", "从 www.perplexity.ai 的 Cloudflare trace 获取出口 IP。"],
-    ["midjourney-trace", "Midjourney", "海外", "midjourney.com", "从 midjourney.com 的 Cloudflare trace 获取出口 IP。"],
-    ["coinbase-trace", "Coinbase", "海外", "coinbase.com", "从 coinbase.com 的 Cloudflare trace 获取出口 IP。"],
-    ["okx-trace", "OKX", "海外", "www.okx.com", "从 www.okx.com 的 Cloudflare trace 获取出口 IP。"],
-    ["crypto-trace", "Crypto.com", "海外", "crypto.com", "从 crypto.com 的 Cloudflare trace 获取出口 IP。"],
-    ["zoom-trace", "Zoom", "海外", "zoom.us", "从 zoom.us 的 Cloudflare trace 获取出口 IP。"],
-    ["onepassword-trace", "1Password", "海外", "1password.com", "从 1password.com 的 Cloudflare trace 获取出口 IP。"],
-    ["wise-trace", "Wise", "海外", "wise.com", "从 wise.com 的 Cloudflare trace 获取出口 IP。"],
-    ["notion-trace", "Notion", "海外", "notion.so", "从 notion.so 的 Cloudflare trace 获取出口 IP。"],
-    ["shopify-trace", "Shopify", "海外", "shopify.com", "从 shopify.com 的 Cloudflare trace 获取出口 IP。"],
-    ["godaddy-trace", "GoDaddy", "海外", "godaddy.com", "从 godaddy.com 的 Cloudflare trace 获取出口 IP。"],
-    ["producthunt-trace", "Product Hunt", "海外", "producthunt.com", "从 producthunt.com 的 Cloudflare trace 获取出口 IP。"],
-    ["cdnjs-trace", "Cloudflare cdnjs", "海外", "cdnjs.cloudflare.com", "从 cdnjs.cloudflare.com 的 Cloudflare trace 获取出口 IP。"],
-    ["npm-trace", "npm registry", "海外", "registry.npmjs.org", "从 registry.npmjs.org 的 Cloudflare trace 获取出口 IP。"],
-    ["kali-trace", "Kali Download", "海外", "kali.download", "从 kali.download 的 Cloudflare trace 获取出口 IP。"],
-    ["unpkg-trace", "unpkg", "海外", "unpkg.com", "从 unpkg.com 的 Cloudflare trace 获取出口 IP。"],
-    ["nodejs-trace", "Node.js", "海外", "nodejs.org", "从 nodejs.org 的 Cloudflare trace 获取出口 IP。"],
-    ["gitlab-trace", "GitLab", "海外", "gitlab.com", "从 gitlab.com 的 Cloudflare trace 获取出口 IP。"],
-    ["crunchyroll-trace", "Crunchyroll", "海外", "crunchyroll.com", "从 crunchyroll.com 的 Cloudflare trace 获取出口 IP。"],
-  ]),
+  ...homeCloudflareProbeIds.map((id) => cloudflareProbeProvider(id)),
   {
     id: "webrtc",
     name: "WebRTC",
@@ -311,62 +269,21 @@ export const probeProviders: ProbeProvider[] = [
   },
 ];
 
-type TraceProviderConfig = [
-  id: string,
-  name: string,
-  group: ProbeProvider["group"],
-  domain: string,
-  description: string,
-  fallbackDomain?: string,
-];
-
-function cloudflareTraceProviders(configs: TraceProviderConfig[]): ProbeProvider[] {
-  return configs.map(([id, name, group, domain, description, fallbackDomain]) => ({
-    id,
-    name,
-    group,
-    homepage: `https://${domain}/cdn-cgi/trace`,
-    description,
-    async query() {
-      const primaryUrl = `https://${domain}/cdn-cgi/trace`;
-      const fallbackUrl = fallbackDomain ? `https://${fallbackDomain}/cdn-cgi/trace` : undefined;
-      return traceProbe(id, primaryUrl, fallbackUrl);
-    },
-  }));
-}
-
-async function traceProbe(providerId: string, url: string, fallbackUrl?: string): Promise<ProbeResult> {
-  const startedAt = performance.now();
-  try {
-    const { value: text, durationMs } = await measure(() => fetchText(url, 5000));
-    const parsed = parseCloudflareTrace(text);
-    return {
-      providerId,
-      ip: parsed.ip,
-      geo: embeddedGeo(providerId, traceLocationText(parsed.colo, parsed.locationCode), parsed.raw),
-      raw: parsed.raw,
-      status: "success",
-      durationMs,
-    };
-  } catch (error) {
-    if (fallbackUrl) {
-      try {
-        const { value: text, durationMs } = await measure(() => fetchText(fallbackUrl, 5000));
-        const parsed = parseCloudflareTrace(text);
-        return {
-          providerId,
-          ip: parsed.ip,
-          geo: embeddedGeo(providerId, traceLocationText(parsed.colo, parsed.locationCode), parsed.raw),
-          raw: parsed.raw,
-          status: "success",
-          durationMs: Math.round(performance.now() - startedAt) || durationMs,
-        };
-      } catch {
-        // Report the original domain failure below; the fallback is only a rescue path.
-      }
-    }
-    return failure(providerId, Math.round(performance.now() - startedAt), error);
+function cloudflareProbeProvider(id: string): ProbeProvider {
+  const probe = builtInCloudflareProbes.find((candidate) => candidate.id === id);
+  if (!probe) {
+    throw new Error(`Cloudflare 探测配置不存在：${id}`);
   }
+  return {
+    id: probe.id,
+    name: probe.name,
+    group: "海外",
+    homepage: probe.traceUrl,
+    description: `从 ${new URL(probe.traceUrl).hostname} 的 Cloudflare trace 获取出口 IP。`,
+    async query() {
+      return queryCloudflareProbe(probe);
+    },
+  };
 }
 
 async function headerProbe(providerId: string, url: string, headerNames: string[]): Promise<ProbeResult> {
@@ -444,14 +361,6 @@ function isIpv6(candidate: string): boolean {
   }
 
   return hasCompression ? hextets.length < 8 : hextets.length === 8;
-}
-
-function traceLocationText(colo?: string, locationCode?: string): string {
-  const normalizedColo = colo?.toUpperCase();
-  if (normalizedColo) {
-    return `Cloudflare ${formatCloudflareColo(normalizedColo)}`;
-  }
-  return locationCode ? `Cloudflare ${locationCode.toUpperCase()}` : "未知归属";
 }
 
 async function fetchCnIp(): Promise<{ ip: string; locationText: string; raw: string; source: string }> {

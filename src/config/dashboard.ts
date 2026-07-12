@@ -66,39 +66,8 @@ export const homeProbeCardSections: ProbeCardSection[] = [
   },
 ];
 
-export const cloudflareProbeCardConfigs: ProbeCardConfig[] = [
-  { providerId: "qualcomm-cn-trace", title: "Cloudflare Trace", source: "高通中国" },
-  { providerId: "discord-trace", title: "Cloudflare Trace", source: "Discord" },
-  { providerId: "x-trace", title: "Cloudflare Trace", source: "X" },
-  { providerId: "medium-trace", title: "Cloudflare Trace", source: "Medium" },
-  { providerId: "anthropic-trace", title: "Cloudflare Trace", source: "Anthropic" },
-  { providerId: "openai-trace", title: "Cloudflare Trace", source: "OpenAI" },
-  { providerId: "sora-trace", title: "Cloudflare Trace", source: "Sora" },
-  { providerId: "pixpix-trace", title: "Cloudflare Trace", source: "PixPix" },
-  { providerId: "perplexity-trace", title: "Cloudflare Trace", source: "Perplexity" },
-  { providerId: "midjourney-trace", title: "Cloudflare Trace", source: "Midjourney" },
-  { providerId: "coinbase-trace", title: "Cloudflare Trace", source: "Coinbase" },
-  { providerId: "okx-trace", title: "Cloudflare Trace", source: "OKX" },
-  { providerId: "crypto-trace", title: "Cloudflare Trace", source: "Crypto.com" },
-  { providerId: "zoom-trace", title: "Cloudflare Trace", source: "Zoom" },
-  { providerId: "onepassword-trace", title: "Cloudflare Trace", source: "1Password" },
-  { providerId: "wise-trace", title: "Cloudflare Trace", source: "Wise" },
-  { providerId: "notion-trace", title: "Cloudflare Trace", source: "Notion" },
-  { providerId: "shopify-trace", title: "Cloudflare Trace", source: "Shopify" },
-  { providerId: "godaddy-trace", title: "Cloudflare Trace", source: "GoDaddy" },
-  { providerId: "producthunt-trace", title: "Cloudflare Trace", source: "Product Hunt" },
-  { providerId: "cdnjs-trace", title: "Cloudflare Trace", source: "Cloudflare cdnjs" },
-  { providerId: "npm-trace", title: "Cloudflare Trace", source: "npm registry" },
-  { providerId: "kali-trace", title: "Cloudflare Trace", source: "Kali Download" },
-  { providerId: "unpkg-trace", title: "Cloudflare Trace", source: "unpkg" },
-  { providerId: "nodejs-trace", title: "Cloudflare Trace", source: "Node.js" },
-  { providerId: "gitlab-trace", title: "Cloudflare Trace", source: "GitLab" },
-  { providerId: "crunchyroll-trace", title: "Cloudflare Trace", source: "Crunchyroll" },
-];
-
 export const homeProbeCardRows = homeProbeCardSections.flatMap((section) => section.rows);
 export const homeProbeCardConfigs = homeProbeCardRows.flat();
-export const probeCardConfigs = [...homeProbeCardConfigs, ...cloudflareProbeCardConfigs];
 
 export const connectivityCardConfigs: ConnectivityCardConfig[] = [
   { checkId: "baidu", title: "百度搜索", source: "国内网站" },

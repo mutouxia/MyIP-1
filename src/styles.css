@@ -73,7 +73,7 @@ body {
 }
 
 .settings-container {
-  width: min(36rem, calc(100% - 2rem));
+  width: min(42rem, calc(100% - 2rem));
   margin: 0 auto;
   padding: 4rem 0;
 }
@@ -103,6 +103,10 @@ body {
 
 .settings-panel {
   padding: 1.25rem !important;
+}
+
+.settings-panel + .settings-panel {
+  margin-top: 1rem;
 }
 
 .settings-row {
@@ -171,6 +175,88 @@ body {
   margin-top: 1.5rem;
 }
 
+.cloudflare-settings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.settings-count {
+  color: #777;
+  font-size: 0.8rem;
+}
+
+.cloudflare-settings-list {
+  max-height: 30rem;
+  overflow-y: auto;
+  border: 1px solid #e2e2e2;
+  border-radius: 5px;
+}
+
+.cloudflare-setting-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1rem;
+  min-height: 3.25rem;
+  padding: 0.55rem 0.65rem 0.55rem 0.85rem;
+  border-bottom: 1px solid #ededed;
+}
+
+.cloudflare-setting-row:last-child {
+  border-bottom: 0;
+}
+
+.cloudflare-setting-identity {
+  min-width: 0;
+}
+
+.cloudflare-setting-identity strong,
+.cloudflare-setting-identity small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cloudflare-setting-identity small {
+  margin-top: 0.1rem;
+  color: #777;
+}
+
+.cloudflare-setting-actions {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.cloudflare-setting-actions .button {
+  min-width: 3rem;
+}
+
+.cloudflare-setting-actions .button:last-child {
+  color: #b33;
+}
+
+.cloudflare-add-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.6rem;
+  margin-top: 0.8rem;
+}
+
+.cloudflare-settings-empty {
+  padding: 1.25rem;
+  color: #777;
+  text-align: center;
+}
+
+#cloudflare-settings-status {
+  min-height: 1.3rem;
+  margin-top: 0.5rem;
+}
+
 .settings-status {
   font-size: 0.875rem;
 }
@@ -191,6 +277,19 @@ body {
   .settings-row {
     grid-template-columns: 1fr;
     gap: 0.65rem;
+  }
+
+  .cloudflare-setting-row {
+    grid-template-columns: 1fr;
+    gap: 0.45rem;
+  }
+
+  .cloudflare-setting-actions {
+    justify-content: flex-end;
+  }
+
+  .cloudflare-add-row {
+    grid-template-columns: 1fr;
   }
 }
 

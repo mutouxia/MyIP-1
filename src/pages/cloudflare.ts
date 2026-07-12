@@ -1,35 +1,23 @@
 import "../styles.css";
-import { cloudflareProbeCardConfigs, probeCardTarget } from "../config/dashboard";
-import { probeProviders } from "../providers/probes";
+import { loadCloudflareProbes } from "../config/cloudflare-preference";
+import { probeCardTarget } from "../config/dashboard";
+import { queryCloudflareProbe } from "../providers/cloudflare";
 import type { ProbeResult } from "../types";
 import { renderCloudflareProbeCards } from "../ui/cloudflare-cards";
 import { requireElement } from "../ui/dom";
 
-const targets = Object.fromEntries(
-  cloudflareProbeCardConfigs.map((config) => [config.providerId, probeCardTarget(config.providerId)]),
-);
-const providersById = new Map(probeProviders.map((provider) => [provider.id, provider]));
+const probes = loadCloudflareProbes();
+const targets = Object.fromEntries(probes.map((probe) => [probe.id, probeCardTarget(probe.id)]));
 
-renderCloudflareProbeCards();
+renderCloudflareProbeCards(probes);
 
 for (const target of Object.values(targets)) {
   setText(target.ip, "检测中");
   setText(target.geo, "");
 }
 
-for (const config of cloudflareProbeCardConfigs) {
-  const provider = providersById.get(config.providerId);
-  if (!provider) {
-    renderProbeResult({
-      providerId: config.providerId,
-      status: "error",
-      durationMs: 0,
-      error: "探测配置不存在",
-    });
-    continue;
-  }
-
-  void provider.query().then(renderProbeResult);
+for (const probe of probes) {
+  void queryCloudflareProbe(probe).then(renderProbeResult);
 }
 
 function renderProbeResult(result: ProbeResult): void {

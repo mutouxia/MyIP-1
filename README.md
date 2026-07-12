@@ -27,7 +27,7 @@ Available pages:
 - `/` — core IP and connectivity checks
 - `/simple/` — compact legacy view
 - `/cloudflare/` — Cloudflare trace split-tunnel checks
-- `/settings/` — browser-local WebRTC display preference
+- `/settings/` — browser-local WebRTC and Cloudflare probe settings
 
 ## Info
 
