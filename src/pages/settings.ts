@@ -22,7 +22,6 @@ import { validateCloudflareTraceUrl } from "../providers/cloudflare";
 import { el, requireElement } from "../ui/dom";
 
 const form = requireElement<HTMLFormElement>("#settings-form");
-const status = requireElement<HTMLElement>("#settings-status");
 const saveSettingsButton = requireElement<HTMLButtonElement>("#save-settings");
 const resetSettingsButton = requireElement<HTMLButtonElement>("#reset-settings");
 const cloudflareStatus = requireElement<HTMLElement>("#cloudflare-settings-status");
@@ -43,7 +42,7 @@ let dragState: {
   pointerOffsetY: number;
   moved: boolean;
 } | null = null;
-let settlingDrag: { row: HTMLElement; timerId: number } | null = null;
+let settlingDrag: { row: HTMLElement; animation: Animation } | null = null;
 let validationSequence = 0;
 
 selectMode(loadWebRtcDisplayMode());
@@ -61,7 +60,7 @@ form.addEventListener("submit", (event) => {
   const webRtcSaved = saveWebRtcDisplayMode(selectedMode());
   const cloudflareSaved = saveCloudflareProbes(cloudflareProbes);
   const saved = webRtcSaved && cloudflareSaved;
-  showStatus(saved ? "设置已保存，返回首页后生效。" : "浏览器存储不可用，设置未保存。", saved);
+  showCloudflareStatus(saved ? "设置已保存" : "浏览器存储不可用，设置未保存。", saved);
 });
 
 resetSettingsButton.addEventListener("click", () => {
@@ -73,8 +72,7 @@ resetSettingsButton.addEventListener("click", () => {
   selectMode(defaultWebRtcDisplayMode);
   cloudflareProbes = defaultCloudflareProbes();
   renderCloudflareProbes();
-  showCloudflareStatus("");
-  showStatus(cleared ? "已恢复全部默认设置。" : "浏览器存储不可用，无法恢复默认。", cleared);
+  showCloudflareStatus(cleared ? "已恢复全部默认设置。" : "浏览器存储不可用，无法恢复默认。", cleared);
 });
 
 addCloudflareButton.addEventListener("click", () => void addCloudflareProbe());
@@ -304,33 +302,51 @@ function finishDragging(event: PointerEvent): void {
   if (completedDrag.handle.hasPointerCapture(event.pointerId)) {
     completedDrag.handle.releasePointerCapture(event.pointerId);
   }
-  const destination = completedDrag.placeholder.getBoundingClientRect();
+  const draggedRect = completedDrag.row.getBoundingClientRect();
   completedDrag.placeholder.replaceWith(completedDrag.row);
   const moved = completedDrag.moved && syncCloudflareProbeOrder();
   validationSequence += 1;
   if (moved) {
     showCloudflareStatus("顺序已调整，尚未保存。", true);
   }
-  const settle = (): void => {
-    if (settlingDrag?.row !== completedDrag.row) {
-      return;
-    }
-    settlingDrag = null;
-    completedDrag.row.classList.remove("is-dragging", "is-settling");
-    completedDrag.row.removeAttribute("style");
-    if (!dragState) {
-      document.body.classList.remove("is-sorting-cloudflare");
-    }
-  };
+  completedDrag.row.classList.remove("is-dragging");
+  completedDrag.row.removeAttribute("style");
+  document.body.classList.remove("is-sorting-cloudflare");
 
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    settle();
+    return;
+  }
+
+  const destination = completedDrag.row.getBoundingClientRect();
+  const deltaX = draggedRect.left - destination.left;
+  const deltaY = draggedRect.top - destination.top;
+  if (deltaX === 0 && deltaY === 0) {
     return;
   }
   completedDrag.row.classList.add("is-settling");
-  completedDrag.row.style.left = `${destination.left}px`;
-  completedDrag.row.style.top = `${destination.top}px`;
-  settlingDrag = { row: completedDrag.row, timerId: window.setTimeout(settle, 170) };
+  const animation = completedDrag.row.animate(
+    [
+      {
+        transform: `translate(${deltaX}px, ${deltaY}px) scale(1.015)`,
+        boxShadow: "0 10px 28px rgb(0 0 0 / 16%)",
+        opacity: 0.94,
+      },
+      {
+        transform: "translate(0, 0) scale(1)",
+        boxShadow: "0 2px 8px rgb(0 0 0 / 10%)",
+        opacity: 1,
+      },
+    ],
+    { duration: 170, easing: "cubic-bezier(0.2, 0, 0, 1)" },
+  );
+  settlingDrag = { row: completedDrag.row, animation };
+  animation.addEventListener("finish", () => {
+    if (settlingDrag?.animation !== animation) {
+      return;
+    }
+    settlingDrag = null;
+    completedDrag.row.classList.remove("is-settling");
+  }, { once: true });
 }
 
 function syncCloudflareProbeOrder(): boolean {
@@ -369,12 +385,8 @@ function finishSettlingDrag(): void {
   }
   const completedDrag = settlingDrag;
   settlingDrag = null;
-  window.clearTimeout(completedDrag.timerId);
-  completedDrag.row.classList.remove("is-dragging", "is-settling");
-  completedDrag.row.removeAttribute("style");
-  if (!dragState) {
-    document.body.classList.remove("is-sorting-cloudflare");
-  }
+  completedDrag.animation.cancel();
+  completedDrag.row.classList.remove("is-settling");
 }
 
 function cancelCloudflareValidation(): void {
@@ -416,11 +428,6 @@ function animateRowsFrom(previousPositions: Map<HTMLElement, number>): void {
       easing: "cubic-bezier(0.2, 0, 0, 1)",
     });
   }
-}
-
-function showStatus(message: string, success: boolean): void {
-  status.textContent = message;
-  status.classList.toggle("is-error", !success);
 }
 
 function showCloudflareStatus(message: string, success = true): void {

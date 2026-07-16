@@ -69,6 +69,8 @@ body {
 }
 
 .settings-container {
+  --settings-control-height: 2.5rem;
+  --settings-segment-width: 4.5rem;
   width: min(42rem, calc(100% - 2rem));
   margin: 0 auto;
   padding: 4rem 0;
@@ -126,7 +128,8 @@ body {
 .webrtc-mode-options {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  width: 13.5rem;
+  width: calc(var(--settings-segment-width) * 3);
+  height: var(--settings-control-height);
   overflow: hidden;
   border: 1px solid #d8d8d8;
   border-radius: 5px;
@@ -149,8 +152,11 @@ body {
 }
 
 .webrtc-mode-option span {
-  display: block;
-  padding: 0.55rem 0.65rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 0 0.65rem;
   color: #555;
   font-size: 0.875rem;
   text-align: center;
@@ -174,6 +180,7 @@ body {
 .settings-actions {
   display: flex;
   align-items: center;
+  justify-content: center;
   flex-wrap: wrap;
   gap: 0.75rem;
   margin-top: 1.5rem;
@@ -184,7 +191,7 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0;
 }
 
 .cloudflare-settings-summary {
@@ -194,8 +201,19 @@ body {
   flex: none;
 }
 
-.cloudflare-settings-toggle {
-  min-width: 3.5rem;
+.button.cloudflare-settings-toggle {
+  width: var(--settings-segment-width);
+  min-width: var(--settings-segment-width);
+  height: var(--settings-control-height);
+  padding: 0 0.65rem;
+  border-color: #d8d8d8;
+  border-radius: 5px;
+  color: #555;
+  font-size: 0.875rem;
+}
+
+#cloudflare-settings-content:not([hidden]) {
+  margin-top: 0.75rem;
 }
 
 .settings-count {
@@ -236,11 +254,9 @@ body {
   transform: scale(1.015);
 }
 
-.cloudflare-setting-row.is-dragging.is-settling {
-  transition: left 160ms cubic-bezier(0.2, 0, 0, 1), top 160ms cubic-bezier(0.2, 0, 0, 1),
-    transform 160ms ease, box-shadow 160ms ease;
-  box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
-  transform: scale(1);
+.cloudflare-setting-row.is-settling {
+  position: relative;
+  z-index: 1;
 }
 
 .cloudflare-setting-placeholder {
@@ -335,6 +351,7 @@ body.is-sorting-cloudflare * {
 #cloudflare-settings-status {
   min-height: 1.3rem;
   margin-top: 0.5rem;
+  text-align: center;
 }
 
 .settings-status {
@@ -360,7 +377,7 @@ body.is-sorting-cloudflare * {
   }
 
   .webrtc-mode-options {
-    width: min(13.5rem, 100%);
+    width: min(calc(var(--settings-segment-width) * 3), 100%);
   }
 
   .cloudflare-settings-header {
